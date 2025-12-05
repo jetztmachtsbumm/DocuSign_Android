@@ -31,8 +31,22 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
+      - name: Debug Signing Configuration
+        run: |
+          echo "=== Checking Signing Setup ==="
+          echo "Keystore file exists: $(test -f ${{ github.workspace }}/signing-key.jks && echo 'YES' || echo 'NO')"
+          echo "Keystore size: $(ls -lh ${{ github.workspace }}/signing-key.jks 2>/dev/null || echo 'File not found')"
+          echo "KEYSTORE_FILE is set: $(test -n "$KEYSTORE_FILE" && echo 'YES' || echo 'NO')"
+          echo "KEY_ALIAS is set: $(test -n "$KEY_ALIAS" && echo 'YES' || echo 'NO')"
+          echo "Passwords are set: $(test -n "$KEYSTORE_PASSWORD" && test -n "$KEY_PASSWORD" && echo 'YES' || echo 'NO')"
+        env:
+          KEYSTORE_FILE: ${{ github.workspace }}/signing-key.jks
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+
       - name: Build Signed Release APK
-        run: ./gradlew assembleRelease --stacktrace
+        run: ./gradlew assembleRelease --stacktrace --info | grep -i sign
         env:
           KEYSTORE_FILE: ${{ github.workspace }}/signing-key.jks
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
