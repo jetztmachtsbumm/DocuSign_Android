@@ -16,4 +16,13 @@ class AppDeviceAdminReceiver : DeviceAdminReceiver() {
         super.onDisabled(context, intent)
         Toast.makeText(context, "Device admin disabled", Toast.LENGTH_SHORT).show()
     }
+
+    override fun onProfileProvisioningComplete(context: Context, intent: Intent) {
+        // This is called when provisioning is complete.
+        // We can now launch the main activity of the app.
+        val mainActivityIntent = Intent(context, MainActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        context.startActivity(mainActivityIntent)
+    }
 }
